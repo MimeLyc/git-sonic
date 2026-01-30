@@ -60,11 +60,12 @@ func main() {
 	ghClient := github.NewClient("", cfg.GitHubToken)
 	gitClient := gitutil.Client{}
 	var llmRunner llm.Runner
+	var chatAgent agent.Agent
 
 	// Route based on agent type
 	switch cfg.AgentType {
 	case "api", "cli", "claude-code", "auto":
-		llmRunner = createUnifiedAgentRunner(cfg)
+		llmRunner, chatAgent = createUnifiedAgentRunner(cfg)
 		log.Printf("unified agent mode: type=%s provider=%s", cfg.AgentType, cfg.LLMProviderType)
 	default:
 		// Legacy path for backward compatibility
@@ -119,6 +120,9 @@ func main() {
 	q.Start(ctx, cfg.MaxWorkers)
 
 	srv := server.New(cfg, ipAllowlist, q)
+	if chatAgent != nil {
+		srv = srv.WithAgent(chatAgent)
+	}
 	httpServer := &http.Server{
 		Addr:    cfg.ListenAddr,
 		Handler: srv.Handler(),
@@ -252,7 +256,8 @@ func createAgentRunner(cfg config.Config) llm.Runner {
 }
 
 // createUnifiedAgentRunner creates an LLM runner using the unified agent interface.
-func createUnifiedAgentRunner(cfg config.Config) llm.Runner {
+// It also returns the agent instance for direct use (e.g., chat endpoint).
+func createUnifiedAgentRunner(cfg config.Config) (llm.Runner, agent.Agent) {
 	log.Printf("[agent-init] creating unified agent runner: type=%s", cfg.AgentType)
 
 	// Create tool registry for API agent
@@ -346,7 +351,7 @@ func createUnifiedAgentRunner(cfg config.Config) llm.Runner {
 	runner := agent.NewRunnerAdapter(ag, defaultAgentSystemPrompt)
 	log.Printf("[agent-init] unified agent created: provider=%s", ag.Capabilities().Provider)
 
-	return runner
+	return runner, ag
 }
 
 const defaultAgentSystemPrompt = `You are an autonomous engineering agent running in a repository workspace.
