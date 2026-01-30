@@ -1,0 +1,9 @@
+.git
+.env
+workdir/
+bin/
+docs/
+deploy/
+tests/
+scripts/
+*.md
