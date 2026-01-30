@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: git-sonic-config
+data:
+  # Server configuration
+  LISTEN_ADDR: ":8080"
+  WEBHOOK_PATH: "/webhook"
+  IP_ALLOWLIST: ""
+  REPO_CLONE_BASE: "/data/workdir"
+  MAX_WORKERS: "2"
+  LOG_LEVEL: "info"
+
+  # Label configuration
+  TRIGGER_LABELS: "ai-ready"
+  NEEDS_INFO_LABEL: "ai-needs-info"
+  IN_PROGRESS_LABEL: "ai-in-progress"
+  DONE_LABEL: "ai-done"
+  PR_SLASH_COMMANDS: "/ai-optimize"
+
+  # Agent configuration
+  AGENT_TYPE: "api"                    # api, cli, claude-code, auto
+  LLM_PROVIDER_TYPE: "claude"          # claude, openai
+  AGENT_MAX_ITERATIONS: "50"
+  AGENT_MAX_MESSAGES: "40"
+  AGENT_MAX_TOKENS: "4096"
+  TOOLS_ENABLED: "true"
+
+  # LLM API configuration (when AGENT_TYPE=api)
+  LLM_API_BASE_URL: "https://api.anthropic.com"
+  LLM_API_MODEL: "claude-sonnet-4-20250514"
+  LLM_API_PATH: "/v1/messages"
+  LLM_API_KEY_HEADER: "x-api-key"
+  LLM_API_KEY_PREFIX: ""
+  LLM_API_MAX_ATTEMPTS: "5"
+  LLM_TIMEOUT: "30m"
+
+  # CLI configuration (when AGENT_TYPE=cli or claude-code)
+  CLI_COMMAND: "claude"
+  CLI_ARGS: ""
+
+  # Context compaction
+  COMPACT_ENABLED: "true"
+  COMPACT_THRESHOLD: "30"
+  COMPACT_KEEP_RECENT: "10"
+
+  # MCP servers (JSON format)
+  # MCP_SERVERS: '[{"name":"fs","command":"npx","args":["-y","@modelcontextprotocol/server-filesystem","/"]}]'
+  MCP_SERVERS: ""
