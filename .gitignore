@@ -1,0 +1,37 @@
+# Binaries
+bin/
+git-sonic
+*.exe
+
+# Environment and secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Working directories
+workdir/
+
+# IDE and editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Claude Code session data
+.claude/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage.out
+coverage.html
+
+# Dependency directories
+vendor/
+
+# Build artifacts
+dist/

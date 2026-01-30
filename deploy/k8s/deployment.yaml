@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: git-sonic
+  labels:
+    app: git-sonic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: git-sonic
+  template:
+    metadata:
+      labels:
+        app: git-sonic
+    spec:
+      containers:
+        - name: git-sonic
+          image: ghcr.io/mimelyc/git-sonic:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: git-sonic-config
+            - secretRef:
+                name: git-sonic-secrets
+          volumeMounts:
+            - name: workdir
+              mountPath: /data/workdir
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+      volumes:
+        - name: workdir
+          emptyDir:
+            sizeLimit: 10Gi
+      securityContext:
+        fsGroup: 1000
