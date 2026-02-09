@@ -334,7 +334,7 @@ func createUnifiedAgentRunner(cfg config.Config) (llm.Runner, agent.Agent) {
 		cliArgs = cfg.ClaudeCodeArgs // backward compatibility
 	}
 	if cliCommand != "" || cfg.AgentType == "cli" || cfg.AgentType == "claude-code" || cfg.AgentType == "auto" {
-		agentCfg.ClaudeCode = &agent.ClaudeCodeConfig{
+		agentCfg.CLI = &agent.CLIAgentConfig{
 			Command: cliCommand,
 			Args:    cliArgs,
 			Timeout: cfg.LLMTimeout,
