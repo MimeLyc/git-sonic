@@ -13,20 +13,20 @@ import (
 	"syscall"
 	"time"
 
-	"git_sonic/pkg/agent"
+	"git_sonic/internal/config"
+	server "git_sonic/internal/controller/http"
+	"git_sonic/internal/controller/webhook"
+	"git_sonic/internal/service/queue"
+	"git_sonic/internal/service/workflow"
 	"git_sonic/pkg/allowlist"
-	"git_sonic/pkg/config"
 	"git_sonic/pkg/github"
 	"git_sonic/pkg/gitutil"
-	"git_sonic/pkg/llm"
-	"git_sonic/pkg/mcp"
-	"git_sonic/pkg/orchestrator"
-	"git_sonic/pkg/queue"
-	"git_sonic/pkg/server"
-	"git_sonic/pkg/tools"
-	"git_sonic/pkg/tools/builtin"
-	"git_sonic/pkg/webhook"
-	"git_sonic/pkg/workflow"
+	"github.com/MimeLyc/agent-core-go/pkg/agent"
+	"github.com/MimeLyc/agent-core-go/pkg/llm"
+	"github.com/MimeLyc/agent-core-go/pkg/mcp"
+	"github.com/MimeLyc/agent-core-go/pkg/orchestrator"
+	"github.com/MimeLyc/agent-core-go/pkg/tools"
+	"github.com/MimeLyc/agent-core-go/pkg/tools/builtin"
 )
 
 func main() {
@@ -185,7 +185,7 @@ func createAgentRunner(cfg config.Config) llm.Runner {
 
 	// Register built-in tools if enabled
 	if cfg.ToolsEnabled {
-		builtin.RegisterAll(registry)
+		builtin.RegisterAllWithGitHub(registry)
 		log.Printf("[agent-init] registered %d built-in tools: %v", registry.Count(), registry.Names())
 	} else {
 		log.Printf("[agent-init] built-in tools disabled")
@@ -263,7 +263,7 @@ func createUnifiedAgentRunner(cfg config.Config) (llm.Runner, agent.Agent) {
 	// Create tool registry for API agent
 	registry := tools.NewRegistry()
 	if cfg.ToolsEnabled {
-		builtin.RegisterAll(registry)
+		builtin.RegisterAllWithGitHub(registry)
 		log.Printf("[agent-init] registered %d built-in tools: %v", registry.Count(), registry.Names())
 	}
 

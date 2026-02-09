@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"git_sonic/pkg/config"
+	"git_sonic/internal/config"
 )
 
 func TestLoadFromEnvDefaults(t *testing.T) {

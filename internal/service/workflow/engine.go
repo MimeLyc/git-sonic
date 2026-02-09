@@ -10,12 +10,13 @@ import (
 	"strings"
 	"time"
 
-	"git_sonic/pkg/config"
+	"git_sonic/internal/config"
+	"git_sonic/internal/controller/webhook"
 	"git_sonic/pkg/github"
 	"git_sonic/pkg/gitutil"
-	"git_sonic/pkg/llm"
 	"git_sonic/pkg/logging"
-	"git_sonic/pkg/webhook"
+	"github.com/MimeLyc/agent-core-go/pkg/instructions"
+	"github.com/MimeLyc/agent-core-go/pkg/llm"
 )
 
 // GitHubClient defines GitHub API methods needed by the engine.
@@ -694,20 +695,25 @@ func (e *Engine) preparePrompt(workDir string, contextReq llm.Request) (llm.Requ
 }
 
 func buildRepoInstructions(workDir string) string {
-	files := []string{"AGENT.md", "CLAUDE.md", "README.md"}
-	sections := make([]string, 0, len(files))
-	for _, name := range files {
-		path := filepath.Join(workDir, name)
-		data, err := os.ReadFile(path)
-		if err != nil {
-			continue
-		}
-		sections = append(sections, fmt.Sprintf("## %s\n%s", name, strings.TrimSpace(string(data))))
+	result := instructions.Load(workDir, instructions.LoadOptions{
+		CandidateFiles: []string{"AGENT.md", "AGENTS.md", "CLAUDE.md"},
+		MaxBytes:       instructions.DefaultMaxBytes,
+	})
+	if strings.TrimSpace(result.Content) != "" {
+		return result.Content
 	}
-	if len(sections) == 0 {
+
+	// Fallback for repos that rely on README-only guidance.
+	readmePath := filepath.Join(workDir, "README.md")
+	data, err := os.ReadFile(readmePath)
+	if err != nil {
 		return "No repository instructions found."
 	}
-	return strings.Join(sections, "\n\n")
+	content := strings.TrimSpace(string(data))
+	if content == "" {
+		return "No repository instructions found."
+	}
+	return fmt.Sprintf("## README.md\n%s", content)
 }
 
 func buildPrompt(contextName, instructionsName, outputName string) string {
@@ -715,9 +721,10 @@ func buildPrompt(contextName, instructionsName, outputName string) string {
 		"You are an autonomous engineering agent running in a repo workspace.",
 		"Repository root: current working directory.",
 		"Read the issue/PR context from: " + contextName + ".",
-		"Read repository instructions from: " + instructionsName + " (includes AGENT.md/CLAUDE.md/README.md if present).",
+		"Read repository instructions from: " + instructionsName + ".",
 		"Follow all repository instructions when making changes.",
-		"If you cannot access the input files, respond with decision=needs_info and explain why.",
+		"Repository instructions are layered from root to leaf; more specific sections should override broader ones.",
+		"If the given infomation is far away from enough, respond with decision=needs_info and explain why.",
 		"",
 		"Required JSON fields: decision, needs_info_comment, commit_message, pr_title, pr_body, files, summary.",
 		"The decision field MUST be one of: proceed (changes ready to submit as PR), needs_info (need more information from user), stop (issue should not be automated).",

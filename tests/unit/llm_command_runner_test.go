@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"git_sonic/pkg/llm"
+	"github.com/MimeLyc/agent-core-go/pkg/llm"
 )
 
 func TestCommandRunnerReadsOutputFile(t *testing.T) {

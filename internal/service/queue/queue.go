@@ -5,7 +5,7 @@ import (
 	"errors"
 	"sync"
 
-	"git_sonic/pkg/webhook"
+	"git_sonic/internal/controller/webhook"
 )
 
 // Handler handles a job.

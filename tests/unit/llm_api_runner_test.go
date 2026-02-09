@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"git_sonic/pkg/llm"
+	"github.com/MimeLyc/agent-core-go/pkg/llm"
 )
 
 func TestAPIRunnerBuildsRequestAndParsesResponse(t *testing.T) {

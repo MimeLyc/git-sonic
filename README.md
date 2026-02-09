@@ -232,19 +232,24 @@ kubectl logs -l app=git-sonic -f
 ```
 git-sonic/
 ├── cmd/git-sonic/       # Entry point
+├── internal/
+│   ├── config/          # Business/runtime app config
+│   ├── controller/
+│   │   ├── http/        # HTTP request handling
+│   │   └── webhook/     # Webhook payload parsing
+│   └── service/
+│       ├── queue/       # Job queue service
+│       └── workflow/    # Issue/PR workflow service
 ├── pkg/
 │   ├── agent/           # Unified agent interface (API + CLI)
-│   ├── config/          # Configuration loading
 │   ├── github/          # GitHub API client
 │   ├── gitutil/         # Git operations
-│   ├── llm/             # LLM providers (Claude, OpenAI)
+│   ├── llm/             # LLM providers + LLM runtime config
 │   ├── mcp/             # MCP server integration
 │   ├── orchestrator/    # Agent loop, tool execution
-│   ├── queue/           # Job queue
-│   ├── server/          # HTTP webhook handler
 │   ├── tools/           # Tool interface and builtins
-│   ├── webhook/         # Webhook parsing
-│   └── workflow/        # Issue/PR workflows
+│   ├── instructions/    # AGENT/CLAUDE instruction loader
+│   └── skills/          # Skill discovery + metadata rendering
 ├── deploy/k8s/          # Kubernetes manifests
 └── docs/                # Documentation
 ```
@@ -256,13 +261,18 @@ git-sonic/
 | `read_file` | Read file contents |
 | `write_file` | Write to file |
 | `list_files` | List directory |
+| `list_skills` | Discover available `SKILL.md` metadata |
+| `read_skill` | Read full `SKILL.md` content by name/path |
 | `bash` | Execute commands |
 | `git_*` | Git operations |
 | `github_*` | GitHub API |
 
 ### Repository Instructions
 
-git-sonic reads `CLAUDE.md` or `AGENT.md` from the repository root to customize agent behavior per-repo.
+git-sonic loads repository instructions from `AGENT.md`, `AGENTS.md`, or `CLAUDE.md` on each directory layer from repository root to the current working directory.  
+Within the same directory, priority is `AGENT.md` > `AGENTS.md` > `CLAUDE.md`; deeper directory rules are treated as more specific.
+
+In agent loop mode, git-sonic also discovers skill metadata (from configured skill directories) and injects it into the system context using progressive disclosure. Agents can load full skill content via `read_skill`.
 
 ## Troubleshooting
 

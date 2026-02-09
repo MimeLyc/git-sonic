@@ -3,7 +3,7 @@ package contract_test
 import (
 	"testing"
 
-	"git_sonic/pkg/llm"
+	"github.com/MimeLyc/agent-core-go/pkg/llm"
 )
 
 func TestParseResponseRequiresDecision(t *testing.T) {

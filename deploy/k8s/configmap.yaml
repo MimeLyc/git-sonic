@@ -21,14 +21,14 @@ data:
   # Agent configuration
   AGENT_TYPE: "api"                    # api, cli, claude-code, auto
   LLM_PROVIDER_TYPE: "claude"          # claude, openai
-  AGENT_MAX_ITERATIONS: "50"
-  AGENT_MAX_MESSAGES: "40"
+  AGENT_MAX_ITERATIONS: "300"
+  AGENT_MAX_MESSAGES: "50"
   AGENT_MAX_TOKENS: "4096"
   TOOLS_ENABLED: "true"
 
   # LLM API configuration (when AGENT_TYPE=api)
-  LLM_API_BASE_URL: "https://api.anthropic.com"
-  LLM_API_MODEL: "claude-sonnet-4-20250514"
+  LLM_API_BASE_URL: "http://api.moonshot.cn/anthropic"
+  LLM_API_MODEL: "kimi-k2.5"
   LLM_API_PATH: "/v1/messages"
   LLM_API_KEY_HEADER: "x-api-key"
   LLM_API_KEY_PREFIX: ""

@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"git_sonic/pkg/config"
+	"git_sonic/internal/config"
+	"git_sonic/internal/controller/webhook"
+	"git_sonic/internal/service/workflow"
 	"git_sonic/pkg/github"
-	"git_sonic/pkg/llm"
-	"git_sonic/pkg/webhook"
-	"git_sonic/pkg/workflow"
+	"github.com/MimeLyc/agent-core-go/pkg/llm"
 )
 
 type fakeGitHub struct {
@@ -84,7 +84,9 @@ func TestIssueLabelFlowCreatesPR(t *testing.T) {
 		DoneLabel:       "ai-done",
 		NeedsInfoLabel:  "ai-needs-info",
 		RepoCloneBase:   t.TempDir(),
-		LLMTimeout:      10 * time.Second,
+		RuntimeConfig: llm.RuntimeConfig{
+			LLMTimeout: 10 * time.Second,
+		},
 	}
 
 	gh := &fakeGitHub{}

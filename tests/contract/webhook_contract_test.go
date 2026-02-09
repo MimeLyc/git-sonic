@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"git_sonic/pkg/webhook"
+	"git_sonic/internal/controller/webhook"
 )
 
 func TestParseEventIssuesLabeled(t *testing.T) {

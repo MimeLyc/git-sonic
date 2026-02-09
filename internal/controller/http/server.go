@@ -8,12 +8,12 @@ import (
 	"net/http"
 	"strings"
 
-	"git_sonic/pkg/agent"
+	"git_sonic/internal/config"
+	"git_sonic/internal/controller/webhook"
+	"git_sonic/internal/service/queue"
 	"git_sonic/pkg/allowlist"
-	"git_sonic/pkg/config"
 	"git_sonic/pkg/logging"
-	"git_sonic/pkg/queue"
-	"git_sonic/pkg/webhook"
+	"github.com/MimeLyc/agent-core-go/pkg/agent"
 )
 
 // Server handles webhook requests.
